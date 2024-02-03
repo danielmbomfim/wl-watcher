@@ -11,7 +11,7 @@ use notify_debouncer_full::{
 };
 
 mod handlers;
-use handlers::handle_file_modifications;
+use handlers::{clear_deploy_dir, source_modifications_handler};
 
 #[derive(Debug, Parser, Default)]
 #[command(author = "Daniel M. Bomfim", version, about)]
@@ -20,13 +20,21 @@ use handlers::handle_file_modifications;
 )]
 ///Script simples para autodeploy de aplicações Weblogic
 struct Args {
-    #[arg(short, long)]
+    #[arg(short, long, default_value = ".")]
     ///Caminho para o diretório a ser observado
     source: PathBuf,
+
+    #[arg(short, long)]
+    ///Caminho da pasta de autodeploy do weblogic
+    deploypath: PathBuf,
 
     #[arg(long, default_value = "1")]
     ///Tempo em segundos que o watcher aguarda por novas mudanças antes de iniciar o package
     delay: u64,
+
+    #[arg(short, long, default_value = "true")]
+    ///Define se a pasta de deploy deve ser limpa antes de iniciar o watcher
+    clear: bool,
 
     #[arg(short = 't', long = "skip-tests", action, default_value = "false")]
     ///Define se os testes de vem ser executados no processo de package
@@ -36,6 +44,11 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
+    if args.clear {
+        clear_deploy_dir(args.deploypath);
+    }
+
+    println!("==>> observando diretório {:?}", args.source);
     if let Err(error) = watch(args.source) {
         println!("{:?}", error);
     }
@@ -57,7 +70,7 @@ fn watch<P: AsRef<Path>>(path: P) -> Result<()> {
     for res in rx {
         match res {
             Ok(events) => {
-                previous_command = handle_file_modifications(events, previous_command);
+                previous_command = source_modifications_handler(events, previous_command);
             }
             Err(errors) => errors.iter().for_each(|error| println!("{error:?}")),
         }
