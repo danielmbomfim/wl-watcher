@@ -65,7 +65,7 @@ fn package_project(pom_path: &str) -> Child {
 fn deploy_application(path: &str) {
     let args = Args::parse();
 
-    println!("Copiando {} para {:?}", path, args.deploypath);
+    println!("Copying {} to {:?}", path, args.deploypath);
 
     let mut process = Command::new("cp")
         .arg(path)
@@ -88,7 +88,7 @@ fn format_file_path(path: &str, file: &str) -> String {
 }
 
 fn clear_previous_processes(previous_process: Option<Child>) {
-    println!("==>> Clearing previous processess");
+    println!("==>> Clearing previous processes");
 
     match previous_process {
         Some(mut process) => {
@@ -111,7 +111,7 @@ pub fn clear_deploy_dir(path: PathBuf) {
         let file_name = file_name.to_str().unwrap();
 
         if file_name.ends_with(".war") {
-            println!("==>> Removendo {}...", file_name);
+            println!("==>> Removing {}...", file_name);
             fs::remove_file(entry.path()).unwrap();
         }
     }

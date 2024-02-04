@@ -48,7 +48,7 @@ fn main() {
         clear_deploy_dir(args.deploypath);
     }
 
-    println!("==>> observando diretório {:?}", args.source);
+    println!("==>> Watching directory {:?}", args.source);
     if let Err(error) = watch(args.source) {
         println!("{:?}", error);
     }
