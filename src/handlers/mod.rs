@@ -20,7 +20,7 @@ pub fn source_modifications_handler(
         evt.paths.iter().for_each(|path| {
             let filepath = path.to_str().unwrap_or("");
 
-            if !code_changed && (filepath.contains(".java") || filepath.contains("pom.xml")) {
+            if !code_changed && (filepath.ends_with(".java") || filepath.ends_with("pom.xml")) {
                 code_changed = true;
             }
 
